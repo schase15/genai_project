@@ -1,0 +1,38 @@
+# Python virtual environment
+project_env/
+venv/
+env/
+.env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+creds.env
+
+# Logs
+*.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# macOS specific
+.DS_Store
+
+# Scratch/temporary files
+scratch.py
