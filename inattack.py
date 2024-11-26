@@ -21,6 +21,15 @@ class InAttack:
         self.early_stop = config.early_stop
         self.dynamic_modify = config.dynamic_modify
         self.config = config
+
+        # GOAT Attack Prompts
+        self.response_priming_prompt = read_prompt_from_file(config.response_priming_prompt)
+        self.refusal_suppression_prompt = read_prompt_from_file(config.refusal_suppression_prompt)
+        self.dual_response_prompt = read_prompt_from_file(config.dual_response_prompt)
+        self.topic_splitting_prompt = read_prompt_from_file(config.topic_splitting_prompt)
+        self.opposite_intent_prompt = read_prompt_from_file(config.opposite_intent_prompt)
+        self.hypotheticals_prompt = read_prompt_from_file(config.hypotheticals_prompt)
+        self.persona_modification_prompt = read_prompt_from_file(config.persona_modification_prompt)
     
     def step_judge(self, query, response):
         prompt = self.step_judge_prompt.format(query=query, response=response)
@@ -34,17 +43,55 @@ class InAttack:
                 print("Error in step_judge: ", e)
                 continue
         return ""
+        
+    def modify_query(self, prompt):
+        for _ in range(3):
+            try:
+                output = gpt_call(self.attack_client, prompt, model_name=self.attack_model_name)
+                return output
+            except Exception as e:
+                print("Error in modify_query: ", e)
+                continue
+        return ""
+    
+    def goat_attack_router(self, response_type, prompt, query, resp, try_hist, queries, query_details):
+        if response_type != "successful":
+
+            queries_str = ""
+            for j, q in enumerate(queries):
+                queries_str += f"{j + 1}. {q}\n"
+            last_response = try_hist[-1]["content"]
+
+            format_args = {
+                "queries": queries_str,
+                "query": query,
+                "output_type": query_details['delivery_type'],
+                "previous_response": last_response
+            }
+
+            if response_type == "unknown":
+                print(f"unknown branch: {query}")
+                
+                # some sort of branching logic here??
+                prompt = self.dual_response_prompt.format(**format_args)
+                prompt = self.topic_splitting_prompt.format(**format_args) 
+                prompt = self.opposite_intent_prompt.format(**format_args)
+                prompt = self.hypotheticals_prompt.format(**format_args)
+                prompt = self.persona_modification_prompt.format(**format_args)
+                
+                query = self.modify_query(prompt)
+            elif response_type == "rejective":
+                print(f"rejective branch: {query}")
+
+                # some sort of branching logic here??
+                prompt = self.response_priming_prompt.format(**format_args) 
+                prompt = self.refusal_suppression_prompt.format(**format_args)
+                
+                query = self.modify_query(prompt)
+            
+            return query, try_hist[:-2]
     
     def handle_response(self, instruction, query, resp, try_hist, queries, query_details):
-        def modify_query(prompt):
-            for _ in range(3):
-                try:
-                    output = gpt_call(self.attack_client, prompt, model_name=self.attack_model_name)
-                    return output
-                except Exception as e:
-                    print("Error in modify_query: ", e)
-                    continue
-            return ""
         response_type = self.step_judge(query, resp)
         
         if response_type == "unknown":
@@ -57,7 +104,7 @@ class InAttack:
                 queries_str += f"{j + 1}. {q}\n"
             last_response = try_hist[-1]["content"]
             prompt = self.modify_prompt.format(queries=queries_str, query=query, output_type=query_details['delivery_type'], previous_response=last_response)
-            query = modify_query(prompt)
+            query = self.modify_query(prompt)
             return query, try_hist[:-2]
         
         return query, try_hist
