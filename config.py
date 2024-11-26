@@ -35,6 +35,15 @@ class InAttackConfig:
         self.modify_prompt = modify_prompt
         self.early_stop = early_stop
         self.dynamic_modify = dynamic_modify
+
+        # GOAT Attacks
+        self.dual_response_prompt = './prompts/goat/attack_dual_response.txt'
+        self.hypotheticals_prompt = './prompts/goat/attack_hypotheticals.txt'
+        self.opposite_intent_prompt = './prompts/goat/attack_opposite_intent.txt'
+        self.persona_modification_prompt = './prompts/goat/attack_persona_modification.txt'
+        self.refusal_suppression_prompt = './prompts/goat/attack_refusal_suppression.txt'
+        self.response_priming_prompt = './prompts/goat/attack_response_priming.txt'
+        self.topic_splitting_prompt = './prompts/goat/attack_topic_splitting.txt'
         
 class DatasetConfig:
     def __init__(self,
