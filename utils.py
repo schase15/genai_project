@@ -2,7 +2,7 @@ import os
 import json
 import time
 from openai import OpenAI
-from typing import Union, List
+from typing import Union, List, Dict
 from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer 
 from anthropic import Anthropic
@@ -32,7 +32,7 @@ def initialize_clients():
         claude_api_key = get_env_variable('CLAUDE_API_KEY')
         claude_base_url = get_env_variable('BASE_URL_CLAUDE')
         if claude_api_key:
-            clients['claude'] = Anthropic(api_key = claude_api_key) # removed base_url=claude_base_url, 
+            clients['claude'] = Anthropic(api_key = claude_api_key)
 
         # DeepInfra client setup
         deepinfra_api_key = get_env_variable('DEEPINFRA_API_KEY')
@@ -159,18 +159,22 @@ def gpt_call(client, query: Union[List, str], model_name="gpt-4o", temperature=0
 
 def gpt_call_append(client, model_name, dialog_hist, query):
     """Append a new message to dialog history and get response"""
-    if isinstance(query, str):
+    if isinstance(query, str) or "claude" in model_name:
         dialog_hist.append({"role": "user", "content": query})
     else:
         dialog_hist.append(query)
     
     try:
         if "claude" in model_name:
+
             # Claude API format
             response = client.messages.create(
                 model=model_name,
                 max_tokens=8192,
-                messages=dialog_hist
+                messages=[{
+                        'role': m['role'],
+                        'content': m['content']
+                    } for m in dialog_hist] 
             )
             resp = response.content[0].text
         else:

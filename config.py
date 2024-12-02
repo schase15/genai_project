@@ -27,7 +27,9 @@ class InAttackConfig:
                  step_judge_prompt = './prompts/attack_step_judge.txt',
                  modify_prompt = './prompts/attack_modify.txt',
                  early_stop = True,
-                 dynamic_modify = True):
+                 dynamic_modify = True,
+                 evaluate = False,
+                 num_actors = 3):
         self.attack_model_name = attack_model_name
         self.target_model_name = target_model_name
         self.pre_attack_data_path = pre_attack_data_path
@@ -35,7 +37,9 @@ class InAttackConfig:
         self.modify_prompt = modify_prompt
         self.early_stop = early_stop
         self.dynamic_modify = dynamic_modify
-        
+        self.evaluate = evaluate
+        self.num_actors = num_actors
+
 class DatasetConfig:
     def __init__(self,
                  attack_data_file = '', 
