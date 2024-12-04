@@ -1,11 +1,60 @@
+## Notes:
 Works with any OpenAI or Anthropic model. It also works with any model from this site: https://deepinfra.com/
-- Anthropic models have been buggy when being target models (still working on fixing this). The other sources work as targets
+- Anthropic models have been buggy when being target models
+    - It runs now but occassionally prints out a list index out of range error. I think when it enters the dynamic modification and there is an error when it tries to do  if dialog_hist[-1]['score'] == 5: in the inattack.py file
+- The other models work as targets
 
-There are some of my initial results in the pre_attack_result and attack_result folders
+## Supported Models
 
-My notes from my first tests just seeing if the creds and the system worked
-- It works with Openai-4o and in my one test produced a violative answer
-- Claude 3.5 Sonnet refuses to generate an attack plan
-- WizardLM-2-8x22B is pretty slow, especially when coming up with the attack plan but it produced good (violative) content
+- OpenAI models (e.g., gpt-4o)
+- Anthropic models (e.g., claude-3-5-sonnet-20241022)
+- DeepInfra models (e.g., meta-llama/Meta-Llama-3.1-405B-Instruct)
 
-Also something we should look at, it seems the judge.py is hardcoded to produce scores based on OpenAI's policy. So maybe we change them to align with how we are going to benchmark (or maybe we don't and we jusdge all models against OAI policy).
+Note: Anthropic models have shown some instability when used as target models.
+
+## Dependencies
+1) Create environment
+2) Install required packages
+
+`pip install -r requirement.txt`
+
+3) Make sure you have a `creds.env` file with the following api keys:
+    - Openai
+    - Anthropic
+    - Deepinfra
+
+## Basic Usage (main.py)
+
+Run a single attack:
+```
+python main.py
+```
+
+Parameters:
+- `questions`: Number of test questions to run. Default is 1
+- `actors`: Number of actors for each question, Default is 3
+- `behavior`: Path to CSV file containing test cases. Default is the jailbreak_bench dataset
+- `attack_model_name`: Model used for generating attacks. Defualt is GPT-4o
+- `target_model_name`: Model being evaluated. Defualt is GPT-4o
+- `early_stop`: Stop if judge determines success. Default is True
+- `dynamic_modify`: Allow dynamic modification of queries. Default is True
+- `evaluate`: Generate evaluation metrics. Default is False
+
+## Multiple Evaluations (run_evaluation.py)
+
+To run multiple evaluations across different models:
+
+```
+python run_evaluation.py
+```
+Parameters:
+- `runs`: Number of evaluation runs per model. Default is 5
+- `questions`: Number of questions per run. Default is 100 (length of jailbreak bench dataset)
+- `actors`: Number of actors per question. Default is 3
+- `behavior`: Path to test cases CSV. Default is jailbreak bench dataset
+- `attack_model`: Model used for generating attacks. Default is gpt-4o
+- `target_models`: Space-separated list of models to evaluate. e.g. gpt-4o claude-sonnet-3-5-20241022
+    - Default is gpt-4o
+- `early_stop`: Stop if judge determines success. Default is True
+- `dynamic_modify`: Allow dynamic modification of queries. Default is True
+- `evaluate`: Generate evaluation metrics. Default is True

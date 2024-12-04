@@ -36,3 +36,7 @@ creds.env
 
 # Scratch/temporary files
 scratch.py
+
+
+# Ignore result files
+*_result/

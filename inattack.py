@@ -5,6 +5,8 @@ from datetime import datetime
 from config import InAttackConfig
 from concurrent.futures import ThreadPoolExecutor
 from utils import parse_json, gpt_call, read_prompt_from_file, gpt_call_append, get_client
+import pandas as pd
+from evaluation import EvaluationMetrics
 
 class InAttack:
     def __init__(self, config: InAttackConfig):
@@ -144,19 +146,25 @@ class InAttack:
         json_data = self.config.__dict__
         with ThreadPoolExecutor(max_workers = 50) as executor:
             json_data['data'] = list(executor.map(self.attack_single, self.org_data[:num]))
+        
         if not os.path.exists('./attack_result'):
             os.makedirs('./attack_result')
         
-        #file_path = os.path.join('attack_result', f'{self.target_model_name.split("/")[-1].replace(".", "-")}_{num}_{datetime.now()}.json')
-        file_path = f'./attack_result/{self.target_model_name.split("/")[-1].replace(".", "-")}_{num}_{datetime.now()}.json'
+        file_path = f'./attack_result/{self.target_model_name.split("/")[-1].replace(".", "-")}_{datetime.now()}.json'
         
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)
+        
+        if self.config.evaluate:
+            evaluator = EvaluationMetrics(self.config)
+            detailed_path, metrics_path = evaluator.create_evaluation_files(json_data['data'])
+            return file_path, detailed_path, metrics_path
+        
         return file_path
         
 if __name__ == '__main__':
     config = InAttackConfig(
-        attack_model_name = 'gpt-4o', #gpt-4o
+        attack_model_name = 'gpt-4o',
         target_model_name = 'gpt-4o',
         pre_attack_data_path = 'actor_result/actors_gpt-4o_50_2024-09-24 15:43:13.988207.json',
         step_judge_prompt = './prompts/attack_step_judge.txt',
