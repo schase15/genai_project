@@ -29,7 +29,8 @@ class InAttackConfig:
                  early_stop = True,
                  dynamic_modify = True,
                  evaluate = False,
-                 num_actors = 3):
+                 num_actors = 3,
+                 use_goat = False):
         self.attack_model_name = attack_model_name
         self.target_model_name = target_model_name
         self.pre_attack_data_path = pre_attack_data_path
@@ -42,6 +43,7 @@ class InAttackConfig:
 
 
         # GOAT Attacks
+        self.goat_step_judge_prompt = './prompts/goat/attack_step_judge.txt'
         self.dual_response_prompt = './prompts/goat/attack_dual_response.txt'
         self.hypotheticals_prompt = './prompts/goat/attack_hypotheticals.txt'
         self.opposite_intent_prompt = './prompts/goat/attack_opposite_intent.txt'
@@ -49,6 +51,7 @@ class InAttackConfig:
         self.refusal_suppression_prompt = './prompts/goat/attack_refusal_suppression.txt'
         self.response_priming_prompt = './prompts/goat/attack_response_priming.txt'
         self.topic_splitting_prompt = './prompts/goat/attack_topic_splitting.txt'
+        self.use_goat = use_goat
         
 class DatasetConfig:
     def __init__(self,
