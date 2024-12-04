@@ -61,6 +61,9 @@ class InAttack:
                 output = gpt_call(self.attack_client, prompt, model_name=self.attack_model_name)
                 data = parse_json(output)
                 next_attack = int(data["next_attack"])
+                
+                assert next_attack >= 0
+                assert next_attack < len(self.goat_prompts)
                 return next_attack
             except Exception as e:
                 print("Error in step_judge: ", e)
@@ -100,7 +103,7 @@ class InAttack:
         prompt = prompt.format(**format_args)
         query = self.modify_query(prompt)
         
-        return query, try_hist[:-2]
+        return query, try_hist
         
     def handle_response(self, instruction, query, resp, try_hist, queries, query_details):
         response_type = self.step_judge(query, resp)
