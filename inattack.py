@@ -119,6 +119,7 @@ class InAttack:
             last_response = try_hist[-1]["content"]
             prompt = self.modify_prompt.format(queries=queries_str, query=query, output_type=query_details['delivery_type'], previous_response=last_response)
             query = self.modify_query(prompt)
+            query = self.modify_query(prompt)
             return query, try_hist[:-2]
         
         return query, try_hist
