@@ -20,7 +20,26 @@ class InAttack:
         self.modify_prompt = read_prompt_from_file(config.modify_prompt)
         self.early_stop = config.early_stop
         self.dynamic_modify = config.dynamic_modify
+        self.use_goat = config.use_goat
         self.config = config
+
+        # GOAT Attack Prompts
+        self.response_priming_prompt = read_prompt_from_file(config.response_priming_prompt)
+        self.refusal_suppression_prompt = read_prompt_from_file(config.refusal_suppression_prompt)
+        self.dual_response_prompt = read_prompt_from_file(config.dual_response_prompt)
+        self.topic_splitting_prompt = read_prompt_from_file(config.topic_splitting_prompt)
+        self.opposite_intent_prompt = read_prompt_from_file(config.opposite_intent_prompt)
+        self.hypotheticals_prompt = read_prompt_from_file(config.hypotheticals_prompt)
+        self.persona_modification_prompt = read_prompt_from_file(config.persona_modification_prompt)
+        self.goat_step_judge_prompt = read_prompt_from_file(config.goat_step_judge_prompt)
+
+        self.goat_prompts = [self.refusal_suppression_prompt,
+                             self.dual_response_prompt,
+                             self.response_priming_prompt,
+                             self.persona_modification_prompt,
+                             self.hypotheticals_prompt,
+                             self.topic_splitting_prompt,
+                             self.opposite_intent_prompt]
     
     def step_judge(self, query, response):
         prompt = self.step_judge_prompt.format(query=query, response=response)
@@ -35,16 +54,58 @@ class InAttack:
                 continue
         return ""
     
+    def goat_step_judge(self, query, response, response_type):
+        prompt = self.goat_step_judge_prompt.format(query=query, response=response, response_type=response_type)
+        for _ in range(3):
+            try:
+                output = gpt_call(self.attack_client, prompt, model_name=self.attack_model_name)
+                data = parse_json(output)
+                next_attack = int(data["next_attack"])
+                
+                assert next_attack >= 0
+                assert next_attack < len(self.goat_prompts)
+                return next_attack
+            except Exception as e:
+                print("Error in step_judge: ", e)
+                continue
+        return -1
+        
+    def modify_query(self, prompt):
+        for _ in range(3):
+            try:
+                output = gpt_call(self.attack_client, prompt, model_name=self.attack_model_name)
+                return output
+            except Exception as e:
+                print("Error in modify_query: ", e)
+                continue
+        return ""
+    
+    def handle_response_goat(self, instruction, query, resp, try_hist, queries, query_details):
+        response_type = self.step_judge(query, resp)
+
+        queries_str = ""
+        for j, q in enumerate(queries):
+            queries_str += f"{j + 1}. {q}\n"
+        last_response = try_hist[-1]["content"]
+
+        format_args = {
+            "queries": queries_str,
+            "query": query,
+            "output_type": query_details['delivery_type'],
+            "previous_response": last_response
+        }
+
+        next_attack = self.goat_step_judge(query, resp, response_type)
+
+        print(f"chosen attack type: {next_attack}")
+
+        prompt = self.goat_prompts[next_attack] if next_attack >= 0 else self.modify_prompt
+        prompt = prompt.format(**format_args)
+        query = self.modify_query(prompt)
+        
+        return query, try_hist
+        
     def handle_response(self, instruction, query, resp, try_hist, queries, query_details):
-        def modify_query(prompt):
-            for _ in range(3):
-                try:
-                    output = gpt_call(self.attack_client, prompt, model_name=self.attack_model_name)
-                    return output
-                except Exception as e:
-                    print("Error in modify_query: ", e)
-                    continue
-            return ""
         response_type = self.step_judge(query, resp)
         
         if response_type == "unknown":
@@ -57,7 +118,8 @@ class InAttack:
                 queries_str += f"{j + 1}. {q}\n"
             last_response = try_hist[-1]["content"]
             prompt = self.modify_prompt.format(queries=queries_str, query=query, output_type=query_details['delivery_type'], previous_response=last_response)
-            query = modify_query(prompt)
+            query = self.modify_query(prompt)
+            query = self.modify_query(prompt)
             return query, try_hist[:-2]
         
         return query, try_hist
@@ -73,7 +135,11 @@ class InAttack:
                     resp, dialog_hist = gpt_call_append(self.target_client, self.target_model_name, dialog_hist, query)
                     
                     if self.dynamic_modify:
-                        new_query, dialog_hist = self.handle_response(instruction, query, resp, dialog_hist, queries, query_details)
+                        if self.use_goat:
+                            new_query, dialog_hist = self.handle_response_goat(instruction, query, resp, dialog_hist, queries, query_details)
+                        else:
+                            new_query, dialog_hist = self.handle_response(instruction, query, resp, dialog_hist, queries, query_details)
+
                         if query != new_query:
                             print(f"new_query: {new_query}")
                             queries[i] = new_query
@@ -122,7 +188,6 @@ class InAttack:
             print(f"Error in summary: {e}")
             return dialog_hist
 
-    
     def attack_single(self, data):
         data_list = []
         is_succeed = False

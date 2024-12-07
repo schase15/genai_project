@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--target_model_name", type=str, default="gpt-4o", help="Target Model name.")
     parser.add_argument("--early_stop", type=bool, default=True, help="early stop if the judge LLM yields success.")
     parser.add_argument("--dynamic_modify", type=bool, default=True, help="apply dynamic modification.")
+    parser.add_argument("--goat",  default=False, dest='goat', action='store_true', help="use GOAT attacks")
 
     # Add evaluation
     parser.add_argument("--evaluate", type=bool, default=False, help="create evaluation CSV with final scores.")
@@ -38,7 +39,8 @@ if __name__ == "__main__":
         early_stop = args.early_stop,
         dynamic_modify = args.dynamic_modify,
         evaluate = args.evaluate,
-        num_actors = args.actors
+        num_actors = args.actors,
+        use_goat = args.goat
     )
     
     in_attacker = InAttack(in_attack_config)
