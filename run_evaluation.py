@@ -19,6 +19,10 @@ def run_single_evaluation(args_dict):
         "--evaluate", str(args_dict["evaluate"])
     ]
     
+    # Add goat flag if enabled
+    if args_dict.get("goat", False):
+        cmd.append("--goat")
+
     try:
         # Run subprocess
         subprocess.run(cmd, check=True)
@@ -39,11 +43,15 @@ def run_single_evaluation(args_dict):
         print(f"  - Error running evaluation: {str(e)}")
         return None
 
-def save_aggregated_results(aggregated_results, target_model):
+def save_aggregated_results(aggregated_results, target_model, goat):
     """Save aggregated results to file"""
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     model_name = target_model.split('/')[-1].replace('.', '-')
-    agg_path = f'./evaluation_result/aggregated_eval_{model_name}_{timestamp}.json'
+    goat_str = '_goat' if goat else ''
+    agg_path = f'./evaluation_result/aggregated_eval_{model_name}_{timestamp}{goat_str}.json'
+
+    # Add GOAT flag to results
+    aggregated_results["goat_enabled"] = goat
     
     with open(agg_path, 'w') as f:
         json.dump(aggregated_results, f, indent=4)
@@ -72,7 +80,7 @@ def evaluate_model(args_dict, runs):
     # Aggregate results
     aggregated = EvaluationMetrics.aggregate_results(results)
     if aggregated:
-        agg_path = save_aggregated_results(aggregated, args_dict['target_model'])
+        agg_path = save_aggregated_results(aggregated, args_dict['target_model'], args_dict['goat'])
         
         # Print summary
         print(f"\nEvaluation Complete for {args_dict['target_model']}!")
@@ -97,6 +105,7 @@ def main():
     parser.add_argument("--early_stop", type=bool, default=True, help="early stop if judge determines success")
     parser.add_argument("--dynamic_modify", type=bool, default=True, help="allow dynamic modification of queries")
     parser.add_argument("--evaluate", type=bool, default=True, help="generate evaluation metrics")
+    parser.add_argument("--goat", action='store_true', default=False, help="use GOAT attacks")
     
     args = parser.parse_args()
     
@@ -111,7 +120,8 @@ def main():
         "attack_model": args.attack_model,
         "early_stop": args.early_stop,
         "dynamic_modify": args.dynamic_modify,
-        "evaluate": args.evaluate
+        "evaluate": args.evaluate,
+        "goat": args.goat
     }
     
     # Track results for all models
