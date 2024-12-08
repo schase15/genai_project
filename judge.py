@@ -3,7 +3,7 @@ import time
 from utils import get_client
 
 class GPTJudge:
-    def __init__(self, model_name = 'gpt-4o', target_model_holder = 'OpenAI'):
+    def __init__(self, model_name = 'gpt-4o-mini', target_model_holder = 'OpenAI'):
         self.judge_client = get_client(model_name)
         self.model_name = model_name
         self.judge_client = get_client(model_name)

@@ -13,8 +13,8 @@ if __name__ == "__main__":
     parser.add_argument("--actors", type=int, default=3, help="Number of actors for each question.")
     parser.add_argument("--behavior", default="./data/jailbreakbench_harmful.csv", help="Path of harmful behaviors CSV file.")
     # attack
-    parser.add_argument("--attack_model_name", type=str, default="gpt-4o", help="Attack Model name.")
-    parser.add_argument("--target_model_name", type=str, default="gpt-4o", help="Target Model name.")
+    parser.add_argument("--attack_model_name", type=str, default="gpt-4o-mini", help="Attack Model name.")
+    parser.add_argument("--target_model_name", type=str, default="gpt-4o-mini", help="Target Model name.")
     parser.add_argument("--early_stop", type=bool, default=True, help="early stop if the judge LLM yields success.")
     parser.add_argument("--dynamic_modify", type=bool, default=True, help="apply dynamic modification.")
     parser.add_argument("--goat",  default=False, dest='goat', action='store_true', help="use GOAT attacks")
