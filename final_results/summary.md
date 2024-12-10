@@ -67,3 +67,16 @@ Score ≥ 5:
   1) gpt-4o-mini_goat_2024-12-08 20:57:48.955177.json (21.00%)
   2) gpt-4o-mini_goat_2024-12-08 20:37:07.612222.json (29.00%)
 
+**Llama 3.1 8B**
+Score ≥ 4:
+- Average success rate: 48.00% (46.00% + 50.00% / 2)
+- Files analyzed:
+  1) Meta-Llama-3-1-8B-Instruct_goat_2024-12-08 22:23:49.900271.json (46.00%)
+  2) Meta-Llama-3-1-8B-Instruct_goat_2024-12-08 22:01:34.424208.json (50.00%)
+
+Score ≥ 5:
+- Average success rate: 18.50% (18.00% + 19.00% / 2)
+- Files analyzed:
+  1) Meta-Llama-3-1-8B-Instruct_goat_2024-12-08 22:23:49.900271.json (18.00%)
+  2) Meta-Llama-3-1-8B-Instruct_goat_2024-12-08 22:01:34.424208.json (19.00%)
+
