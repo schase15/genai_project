@@ -248,8 +248,10 @@ class InAttack:
         
         if not os.path.exists('./attack_result'):
             os.makedirs('./attack_result')
-        
-        file_path = f'./attack_result/{self.target_model_name.split("/")[-1].replace(".", "-")}_{datetime.now()}.json'
+    
+        # Add 'goat' to filename if GOAT was used
+        goat_suffix = "_goat" if self.use_goat else ""
+        file_path = f'./attack_result/{self.target_model_name.split("/")[-1].replace(".", "-")}{goat_suffix}_{datetime.now()}.json'
         
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, ensure_ascii=False, indent=4)

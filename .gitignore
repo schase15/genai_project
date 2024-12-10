@@ -41,3 +41,6 @@ scratch.py
 
 # Ignore result files
 *_result/
+
+# Allow final results
+!final_results
