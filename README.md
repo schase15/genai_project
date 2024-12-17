@@ -23,7 +23,7 @@ Supported models via APIs
 1) Create environment
 2) Install required packages
 
-`pip install -r requirement.txt`
+`pip install -r requirements.txt`
 
 3) Make sure you have a `creds.env` file with the following api keys:
     - Openai: GPT_API_KEY=******
