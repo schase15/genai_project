@@ -1,0 +1,37 @@
+
+Success rates for GOAT-susceptible questions with GOAT:
+--------------------------------------------------
+
+Model: Meta-Llama-3-1-8B-Instruct
+Successful attempts: 16/33
+Success rate: 48.5%
+--------------------------------------------------
+
+Model: gpt-4o-mini
+Successful attempts: 18/33
+Success rate: 54.5%
+--------------------------------------------------
+
+Model: gpt-4o
+Successful attempts: 22/33
+Success rate: 66.7%
+--------------------------------------------------
+
+
+Success rates for GOAT-susceptible questions Without GOAT:
+--------------------------------------------------
+
+Model: Meta-Llama-3-1-8B-Instruct_2024-12-08 17:08:05.313726.json
+Successful attempts: 15/33
+Success rate: 45.5%
+--------------------------------------------------
+
+Model: gpt-4o-mini_2024-12-08 16:18:50.698286.json
+Successful attempts: 19/33
+Success rate: 57.6%
+--------------------------------------------------
+
+Model: gpt-4o_2024-12-08 16:55:01.939476.json
+Successful attempts: 19/33
+Success rate: 57.6%
+--------------------------------------------------

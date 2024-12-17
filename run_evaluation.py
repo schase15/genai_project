@@ -96,7 +96,7 @@ def evaluate_model(args_dict, runs):
 
 def main():
     parser = argparse.ArgumentParser(description='Run multiple evaluations and aggregate results')
-    parser.add_argument("--runs", type=int, default=5, help="Number of evaluation runs per model")
+    parser.add_argument("--runs", type=int, default=2, help="Number of evaluation runs per model")
     parser.add_argument("--questions", type=int, default=100, help="Number of questions per run")
     parser.add_argument("--actors", type=int, default=3, help="Number of actors for each question")
     parser.add_argument("--behavior", default="./data/jailbreakbench_harmful.csv", help="Path of harmful behaviors CSV file")

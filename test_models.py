@@ -40,13 +40,12 @@ def main():
         "runs": 2,
         "questions": 100,
         "actors": 3,
-        "behavior": "./data/jailbreakbench_harmful.csv",
+        "behavior": "../data/jailbreakbench_harmful.csv",
         "attack_model": "gpt-4o",
         "target_models": [
             "gpt-4o-mini",
             "gpt-4o",
-            "meta-llama/Meta-Llama-3.1-8B-Instruct",
-            # "meta-llama/Meta-Llama-3.1-405B-Instruct"
+            "meta-llama/Meta-Llama-3.1-8B-Instruct"
         ],
         "early_stop": True,
         "dynamic_modify": True,
@@ -54,9 +53,9 @@ def main():
         "goat": False
     }
 
-    # # Run without GOAT attacks
-    # print("\n=== Running without GOAT attacks ===")
-    # run_test_suite(config)
+    # Run without GOAT attacks
+    print("\n=== Running without GOAT attacks ===")
+    run_test_suite(config)
 
     # Run with GOAT attacks
     print("\n=== Running with GOAT attacks ===") 
